@@ -7,7 +7,7 @@ class MT:
         self.etats = etats #ensemble fini des états
         self.alphabet_entree = alphabet_entree 
         self.alphabet_travail = alphabet_travail
-        self.transitions = transitions #ensemble des transitions (dictionnaire)
+        self.transitions = transitions #ensemble des transitions (dictionnaire de tuples)
         self.rub = rub #nombre de rubans
         self.etat_initial = "I"
         self.etat_final = "F"
@@ -20,12 +20,13 @@ class MT:
         Etat initial: {self.etat_initial}, 
         Ensemble de transitions : {self.transitions}"""
         
+        
     
 class Configuration:
     def __init__(self, etat_courant, rubans, pos_tete):
         self.etat_courant = etat_courant
         self.rubans = rubans #liste de listes
-        self.pos_tete = pos_tete #liste de r positions?
+        self.pos_tete = pos_tete #liste de rub positions
         
     def __str__(self):
         result = f"Etat : {self.etat_courant}\n"
@@ -62,8 +63,8 @@ def parse_file(MT_file):
         clean_lines.append(line)
     
     
-    etat_init_file = None
-    etat_finale_file = None
+    etat_init_file = None #variable qui va prendre la valeur "init:q0" qui est la convention sur les fichiers de TMSimulator
+    etat_finale_file = None #valeur "accept:qAccept"
     
     for line in clean_lines:
         if line.startswith("init"):
@@ -72,6 +73,7 @@ def parse_file(MT_file):
             etat_finale_file = line.split(":")[1].strip()
     
     def mapper(nom):
+        """Cette fonction va mapper les valeurs du site sur les valeurs par défaut du projet"""
         if nom == etat_init_file: return 'I'
         if nom == etat_finale_file: return 'F'
         return nom
@@ -85,11 +87,10 @@ def parse_file(MT_file):
             continue
         
         else: #Transitions
-            
             #ligne 1
-            parts_in = [p.strip() for p in line.split(",")]
-            etat_courant = mapper(parts_in[0]) # q0,0
-            symboles_lus = tuple(parts_in[1:])
+            ligne_1 = [p.strip() for p in line.split(",")]
+            etat_courant = mapper(ligne_1[0]) # "q0" -> "I"
+            symboles_lus = tuple(ligne_1[1:])
             
             etats.add(etat_courant)
             alphabet_travail.update(symboles_lus)
@@ -98,17 +99,16 @@ def parse_file(MT_file):
             i += 1
             if i < len(clean_lines):
                 line_out = clean_lines[i]
-                parts_out = [p.strip() for p in line_out.split(",")]
+                ligne_2 = [p.strip() for p in line_out.split(",")]
                 
-                etat_suivant = mapper(parts_out[0]) # qRight0,_,>
+                etat_suivant = mapper(ligne_2[0]) # qRight0,_,>
                 rub = len(symboles_lus) #Déduit le nombre de rubans
-                symboles_ecrits = tuple(parts_out[1:rub+1])
-                direction = tuple(parts_out[rub+1:])
+                symboles_ecrits = tuple(ligne_2[1:rub+1])
+                direction = tuple(ligne_2[rub+1:])
                 
                 alphabet_travail.update(symboles_ecrits)
                 transitions[(etat_courant, symboles_lus)] = (etat_suivant, symboles_ecrits, direction)
             i += 1
-                
     return MT(etats, alphabet_entree, alphabet_travail, transitions, rub)
 
 
@@ -127,8 +127,10 @@ def config_init(mot, mt):
     pos_tete = [0]*mt.rub
 
     return Configuration(mt.etat_initial, rubans, pos_tete)
-    
-        
+
+
+
+
 ##############
 ##Question 3##
 ##############
@@ -136,32 +138,32 @@ def config_init(mot, mt):
 def un_pas_de_calcul(mt, config):
     if config.etat_courant == mt.etat_final:
         return False
-    
+
     symboles_lus = []
     for i in range(mt.rub):
-        pos = config.pos_tete[i]
-        rubans = config.rubans[i]
+        pos = config.pos_tete[i] #Recupere l'index de la tete de lecture sur ce ruban
+        rubans = config.rubans[i] #recuperer le i-eme ruban
 
         if pos >= len(rubans):
-            rubans.append('_')
+            rubans.append('_') #simule le ruban infini
             
-        symboles_lus.append(rubans[pos])
+        symboles_lus.append(rubans[pos]) #Stocker les caracteres lus dans une liste temporaire
         
     cle_transition = (config.etat_courant, tuple(symboles_lus))
     
     if cle_transition not in mt.transitions:
         return False
-    
-    #Les actions
-    etat_suivant, symboles_ecrits, direction = mt.transitions[cle_transition]
+
+    #Faire la transition
+    etat_suivant, symboles_ecrits, direction = mt.transitions[cle_transition] #le Tuple unpacking c'est génial
     config.etat_courant = etat_suivant
-    
+
     #On les appliques pour chaque ruban
     for i in range(mt.rub):
         pos = config.pos_tete[i]
         #Ecriture
         config.rubans[i][pos] = symboles_ecrits[i]
-        
+
         #Deplacement
         if direction[i] in ('>', 'R'):
             config.pos_tete[i]+=1
@@ -182,9 +184,9 @@ def un_pas_de_calcul(mt, config):
 ###############
 
 def simuler(mot, mt):
-    config = config_init(mot, mt)
+    config = config_init(mot, mt) 
     while config.etat_courant != mt.etat_final:
-        if not un_pas_de_calcul(mt, config):
+        if not un_pas_de_calcul(mt, config): #on vérifie si le mot est accepté (cle_transition)
             break
         
     return config
@@ -208,6 +210,10 @@ def afficher_simulation(mot, mt):
 
 
 
+################
+###QUESTION 6###
+################
+
 
 
 
@@ -226,4 +232,48 @@ details_simulation = afficher_simulation("10101", mt)
 print(f"Voici chaque étape de la simulation: \n {details_simulation}")
 simulation_complete = simuler("10101", mt)
 print(f"Voici une simulation complète : \n {simulation_complete}")
+
+
+
+
+####################################
+###### Machine Universelle##########
+####################################
+
+
+###############
+## Question 7##
+###############
+
+def codage_mu(mt):
+    morceaux = []
+    map_etat = {mt.etat_initial: '0', mt.etat_final: '1'}
+    compteur_etat = 2
+    
+    def mapping_etats(nom):
+        nonlocal compteur_etat
+        if nom not in map_etat:
+            map_etat[nom] = bin(compteur_etat)[2:]
+            compteur_etat += 1
+        return map_etat[nom]    
+        
+    for (etat_courant, symboles_lus), (etat_suivant, symboles_ecrits, directions) in mt.transitions.items():
+        e1 = mapping_etats(etat_courant)
+        e2 = mapping_etats(etat_suivant)
+        
+        s1 = symboles_lus[0]
+        s2 = symboles_ecrits[0]
+        
+        d = directions[0]        
+        bloc = f"{e1}|{s1}|{s2}|{d}|{e2}"
+        morceaux.append(bloc)
+        
+    return "|".join(morceaux)
+
+
+print("============================================")
+print("Essai pour la machine universelle")
+print("============================================")
+mt = parse_file("palindrome.txt")
+print(codage_mu(mt))
 
