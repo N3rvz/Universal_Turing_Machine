@@ -1,13 +1,13 @@
+import argparse
 ##############
 ##Question 1##
 ##############
-
 class MT:
     def __init__(self, etats, alphabet_entree, alphabet_travail, transitions, rub=1):
         self.etats = etats #ensemble fini des états
         self.alphabet_entree = alphabet_entree 
         self.alphabet_travail = alphabet_travail
-        self.transitions = transitions #ensemble des transitions (dictionnaire de tuples)
+        self.transitions = transitions #ensemble des transitions (dictionnaire de tuples) {(q0, (0, 1)): (q1, _, >)}
         self.rub = rub #nombre de rubans
         self.etat_initial = "I"
         self.etat_final = "F"
@@ -20,8 +20,7 @@ class MT:
         Etat initial: {self.etat_initial}, 
         Ensemble de transitions : {self.transitions}"""
         
-        
-    
+
 class Configuration:
     def __init__(self, etat_courant, rubans, pos_tete):
         self.etat_courant = etat_courant
@@ -127,10 +126,8 @@ def config_init(mot, mt):
     pos_tete = [0]*mt.rub
 
     return Configuration(mt.etat_initial, rubans, pos_tete)
-
-
-
-
+    
+        
 ##############
 ##Question 3##
 ##############
@@ -219,19 +216,8 @@ def afficher_simulation(mot, mt):
 
 
 
-#TESTS
-mt = parse_file("palindrome.txt")
-config = config_init("10101", mt)
-print(config)
 
-resultat = un_pas_de_calcul(mt, config)
-print(config)
-print("Transition appliquée :", resultat)
 
-details_simulation = afficher_simulation("10101", mt)
-print(f"Voici chaque étape de la simulation: \n {details_simulation}")
-simulation_complete = simuler("10101", mt)
-print(f"Voici une simulation complète : \n {simulation_complete}")
 
 
 
@@ -271,9 +257,77 @@ def codage_mu(mt):
     return "|".join(morceaux)
 
 
-print("============================================")
-print("Essai pour la machine universelle")
-print("============================================")
-mt = parse_file("palindrome.txt")
-print(codage_mu(mt))
 
+
+def main():
+    #On créé l'analyseur
+    parser = argparse.ArgumentParser(description = "Simulateur et Interpreteur de machine de Turing")
+    
+    #Creation des arguments
+    parser.add_argument("-q", "--question", type=int, required=True,
+                        help="Numéro de la question à exécuter (ex: 4, 5, 6...)")
+    parser.add_argument("-f", "--file", type=str, help="Chemin vers le fichier de la machine au format Turing machine simulator")
+    parser.add_argument("-w", "--word", type=str, help="Mot d'entrée pour la simulation sur le ruban")
+    
+    #Lecture des args
+    args = parser.parse_args()
+    
+    if args.question == 1:
+        print('La question 1 correspond aux structures de données (classes MT et Configuration)')
+    
+    elif args.question == 2:
+        if not args.file or args.word is None:
+            print(f" Erreur, Q2 nécessite -f et -w")
+            return
+        print(f"===== Q2 : Initialisation MT et Configuration ====")
+        mt = parse_file(args.file)
+        config = config_init(args.word, mt)
+        print(config)
+        
+    elif args.question == 3:
+        if not args.file or args.word is None:
+            print("Erreur : Q3 nécessite --file et --word")
+            return
+        print(f"==== Question 3 =====")
+        mt = parse_file(args.file)
+        config = config_init(args.word, mt)
+        print(f"Configuration initiale :\n")
+        print(config)
+        un_pas_de_calcul(mt, config)
+        print(f"Configuration après un pas de calcul :\n {config}")
+    
+    
+    elif args.question == 4:
+        if not args.file or args.word is None:
+            print(f"Erreur, la question 4 nécessite un fichier (--file) et un mot d'entrée (--word)")
+            return
+        print(f"========Simulation (Q4) de {args.file} avec le mot {args.word} ==========")
+        mt = parse_file(args.file)
+        simule = simuler(args.word ,mt)
+        print(simule)
+    
+    elif args.question == 5:
+        if not args.file or args.word is None:
+            print(f"----- Erreur: Q5 nécessite --file et --word")
+            return
+        print(f"=== Q5 : Simulation avec affichages")
+        mt = parse_file(args.file)
+        print(afficher_simulation(args.word, mt))
+        
+    elif args.question == 6:
+        print(f"==== Q6: Test des machines: ")
+        
+    elif args.question == 7:
+        if not args.file:
+            print(f"Erreur: Q7 nécessite un fichier -f (MTS)")
+            return
+        print(f"==== Question 7 : Traduction en code <M> ====")
+        mt = parse_file(args.file)
+        code_machine = codage_mu(mt)
+        print(code_machine)
+        
+    else:
+        print(f"La question {args.question} n'es pas encore implémentée ou reconnue.")
+        
+if __name__ == "__main__":
+    main()
