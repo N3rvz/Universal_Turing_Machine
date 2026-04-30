@@ -1,0 +1,74 @@
+name: Comparateur egalite x#y avec x et y deux entiers représentés en binaire
+init: q0
+accept: qAccept
+
+// Lecture du premier caractere du mot 1
+q0,0
+qDieze0,X,>
+
+q0,1
+qDieze1,Y,>
+
+// Si on lit # alors le mot 1 est fini
+q0,#
+qVerifM2,#,>
+
+
+qDieze0,0
+qDieze0,0,>
+qDieze0,1
+qDieze0,1,>
+qDieze0,#
+qMot2_0,#,>
+
+qDieze1,0
+qDieze1,0,>
+qDieze1,1
+qDieze1,1,>
+qDieze1,#
+qMot2_1,#,>
+
+// Traverser les caracteres deja verifies du mot 2
+qMot2_0,X
+qMot2_0,X,>
+qMot2_0,Y
+qMot2_0,Y,>
+
+qMot2_1,X
+qMot2_1,X,>
+qMot2_1,Y
+qMot2_1,Y,>
+
+// Correspondance trouvee dans le mot 2
+qMot2_0,0
+qRetour,X,<
+
+qMot2_1,1
+qRetour,Y,<
+
+// Retour vers la gauche
+qRetour,X
+qRetour,X,<
+qRetour,Y
+qRetour,Y,<
+qRetour,#
+qRetourM1,#,<
+
+qRetourM1,0
+qRetourM1,0,<
+qRetourM1,1
+qRetourM1,1,<
+qRetourM1,X
+q0,X,>
+qRetourM1,Y
+q0,Y,>
+qRetourM1,_
+q0,_,>
+
+// Verification que le mot 2 ne contient plus de 0 ou 1
+qVerifM2,X
+qVerifM2,X,>
+qVerifM2,Y
+qVerifM2,Y,>
+qVerifM2,_
+qAccept,_,-

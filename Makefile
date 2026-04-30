@@ -30,6 +30,11 @@ q5:
 q6:
 		$(PYTHON) $(SCRIPT) -q 6 -f $(FILE) -w $(WORD)
 
+q6_comp:
+		python3 $(SCRIPT) -q 6 -f compare.txt -w "10101#10101"
+q6_comp_faux:
+		python3 $(SCRIPT) -q 6 -f compare.txt -w "100#111"
+
 q7:
 		$(PYTHON) $(SCRIPT) -q 7 -f $(FILE)
 

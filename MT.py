@@ -25,7 +25,7 @@ class Configuration:
     def __init__(self, etat_courant, rubans, pos_tete):
         self.etat_courant = etat_courant
         self.rubans = rubans #liste de listes
-        self.pos_tete = pos_tete #liste de rub positions
+        self.pos_tete = pos_tete #liste des positions
         
     def __str__(self):
         result = f"Etat : {self.etat_courant}\n"
@@ -47,7 +47,7 @@ def parse_file(MT_file):
     
     etats = set()
     alphabet_entree = set()
-    alphabet_travail = set(['_'])
+    alphabet_travail = {'_'}
     transitions = {}
     etat_initial = "I"
     etat_final = "F"
@@ -115,12 +115,12 @@ def config_init(mot, mt):
     rubans = []
     
     if not mot:
-        rubans_1 = ['_']
+        rubans_1 = ['_'] #Si il n'a pas de mots on rempli le ruban 1 avec des caractères blancs
     else:
         rubans_1 = list(mot)
-    rubans.append(rubans_1)
+    rubans.append(rubans_1) #Ajoute le premier ruban à la liste des rubans
     
-    for _ in range (1, mt.rub):
+    for _ in range (1, mt.rub): #Remplir les autres rubans de caractères blancs
         rubans.append(['_'])
         
     pos_tete = [0]*mt.rub
@@ -204,14 +204,6 @@ def afficher_simulation(mot, mt):
         print(f"Voici une suite de config: \n {config}")
     return config
     
-
-
-
-################
-###QUESTION 6###
-################
-
-
 
 
 
@@ -363,10 +355,15 @@ def main():
             return
         print(f"=== Q5 : Simulation avec affichages")
         mt = parse_file(args.file)
-        print(afficher_simulation(args.word, mt))
+        afficher_simulation(args.word, mt)
         
     elif args.question == 6:
-        print(f"==== Q6: Test des machines: ")
+        if not args.file or args.word is None:
+            print("Erreur: Question 6 nécessite un fichier -f et un mot d'entrée -w")
+            return
+        print(f"==== Q6: Test de la machine: {args.file} ====")
+        mt = parse_file(args.file)
+        afficher_simulation(args.word, mt)
         
     elif args.question == 7:
         if not args.file:
