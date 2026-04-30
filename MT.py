@@ -251,7 +251,7 @@ def codage_mu(mt):
         s2 = symboles_ecrits[0]
         
         d = directions[0]        
-        bloc = f"{e1}|{s1}|{s2}|{d}|{e2}"
+        bloc = f"{e1}|{s1}|{s2}|{d}|{e2}\n"
         morceaux.append(bloc)
         
     return "|".join(morceaux)
