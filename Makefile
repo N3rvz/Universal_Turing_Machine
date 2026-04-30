@@ -1,4 +1,5 @@
 #Variables par défaut
+PYTHON ?= python3
 FILE ?= palindrome.txt
 WORD ?= 10101
 
@@ -8,26 +9,32 @@ SCRIPT = MT.py
 all: help
 
 help:
-		python3 $(SCRIPT) -h
+		$(PYTHON) $(SCRIPT) -h
 
 #Questions
 q1:
-		python3 $(SCRIPT) -q 1
+		$(PYTHON) $(SCRIPT) -q 1
 
 q2:
-		python3 $(SCRIPT) -q 2 -f $(FILE) -w $(WORD)
+		$(PYTHON) $(SCRIPT) -q 2 -f $(FILE) -w $(WORD)
 
 q3:
-		python3 $(SCRIPT) -q 3 -f $(FILE) -w $(WORD)
+		$(PYTHON) $(SCRIPT) -q 3 -f $(FILE) -w $(WORD)
 
 q4:
-		python3 $(SCRIPT) -q 4 -f $(FILE) -w $(WORD)
+		$(PYTHON) $(SCRIPT) -q 4 -f $(FILE) -w $(WORD)
 
 q5:
-		python3 $(SCRIPT) -q 5 -f $(FILE) -w $(WORD)
+		$(PYTHON) $(SCRIPT) -q 5 -f $(FILE) -w $(WORD)
+
+q6:
+		$(PYTHON) $(SCRIPT) -q 6 -f $(FILE) -w $(WORD)
 
 q7:
-		python3 $(SCRIPT) -q 7 -f $(FILE)
+		$(PYTHON) $(SCRIPT) -q 7 -f $(FILE)
+
+q8:
+		$(PYTHON) $(SCRIPT) -q 8 -f $(FILE)
 
 clean:
 		rm -rf __pycache__

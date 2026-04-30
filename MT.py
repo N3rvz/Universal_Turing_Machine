@@ -232,12 +232,23 @@ def afficher_simulation(mot, mt):
 ###############
 
 def codage_mu(mt):
+    """
+    Encode une définition de Machine de Turing (MT) en une chaîne de caractères unique,
+    représentant la première étape vers une Machine de Turing Universelle.
+    L'encodage est spécifique aux machines à un seul ruban pour cette implémentation.
+
+    Le format de sortie est une chaîne de transitions séparées par '|', où chaque
+    transition est de la forme: etat_depart|symbole_lu|symbole_ecrit|direction|etat_arrivee
+    """
     morceaux = []
+    # 'I' est mappé à '0', 'F' à '1'. Les autres états sont mappés à leur représentation binaire.
     map_etat = {mt.etat_initial: '0', mt.etat_final: '1'}
     compteur_etat = 2
+    compteur_etat = 2 # Commence à 2 car 0 et 1 sont réservés.
     
     def mapping_etats(nom):
         nonlocal compteur_etat
+        nonlocal compteur_etat # Permet de modifier la variable de la fonction parente.
         if nom not in map_etat:
             map_etat[nom] = bin(compteur_etat)[2:]
             compteur_etat += 1
@@ -247,16 +258,56 @@ def codage_mu(mt):
         e1 = mapping_etats(etat_courant)
         e2 = mapping_etats(etat_suivant)
         
+
+        # NOTE: Cette version ne gère que les machines à un seul ruban pour le codage.
         s1 = symboles_lus[0]
         s2 = symboles_ecrits[0]
         
         d = directions[0]        
-        bloc = f"{e1}|{s1}|{s2}|{d}|{e2}\n"
+        # On construit le bloc de transition sans saut de ligne.
+        bloc = f"{e1}|{s1}|{s2}|{d}|{e2}"
         morceaux.append(bloc)
         
+    
+    # On joint toutes les représentations de transition avec '|'.
     return "|".join(morceaux)
 
+################
+###QUESTION 8###
+################
 
+def codage_binaire(mt):
+    # 1. On récupère le code de la Question 7
+    code_str = codage_mu(mt)
+    
+    # 2. Notre dictionnaire de traduction défini arbitrairement sur 4 bits
+    table_binaire = {
+        '0': '0000',
+        '1': '0001',
+        '|': '0010',
+        '>': '0011',
+        '<': '0100',
+        '-': '0101',
+        '_': '0110',
+        '#': '0111'
+    }
+    
+    # Sécurité : Si un caractère inconnu de l'alphabet apparaît, on lui crée un code dynamique
+    compteur_inconnu = 8 
+    
+    code_bin = ""
+    for char in code_str:
+        if char not in table_binaire:
+            # zfill(4) permet de toujours garder un bloc de 4 chiffres (ex: '1000')
+            table_binaire[char] = bin(compteur_inconnu)[2:].zfill(4)
+            compteur_inconnu += 1
+            
+        code_bin += table_binaire[char]
+        
+    # 3. Interprétation mathématique (on dit à Python de lire le texte comme un nombre en base 2)
+    entier_associe = int(code_bin, 2)
+    
+    return code_str, code_bin, entier_associe
 
 
 def main():
@@ -325,6 +376,18 @@ def main():
         mt = parse_file(args.file)
         code_machine = codage_mu(mt)
         print(code_machine)
+      
+    elif args.question == 8:
+        if not args.file:
+            print("Erreur: Q8 nécessite un fichier -f (MTS)")
+            return
+        print("==== Question 8 : Codage binaire et Entier ====")
+        mt = parse_file(args.file)
+        code_str, code_bin, entier = codage_binaire(mt)
+        
+        print(f"Codage <M> d'origine : \n{code_str}\n")
+        print(f"Codage purement binaire : \n{code_bin}\n")
+        print(f"Interprétation en entier (Nombre de Gödel) : \n{entier}\n")    
         
     else:
         print(f"La question {args.question} n'es pas encore implémentée ou reconnue.")
