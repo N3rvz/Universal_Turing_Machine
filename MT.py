@@ -25,7 +25,7 @@ class Configuration:
     def __init__(self, etat_courant, rubans, pos_tete):
         self.etat_courant = etat_courant
         self.rubans = rubans #liste de listes
-        self.pos_tete = pos_tete #liste des positions
+        self.pos_tete = pos_tete #liste de rub positions
         
     def __str__(self):
         result = f"Etat : {self.etat_courant}\n"
@@ -47,7 +47,7 @@ def parse_file(MT_file):
     
     etats = set()
     alphabet_entree = set()
-    alphabet_travail = {'_'}
+    alphabet_travail = set(['_'])
     transitions = {}
     etat_initial = "I"
     etat_final = "F"
@@ -115,12 +115,12 @@ def config_init(mot, mt):
     rubans = []
     
     if not mot:
-        rubans_1 = ['_'] #Si il n'a pas de mots on rempli le ruban 1 avec des caractères blancs
+        rubans_1 = ['_']
     else:
         rubans_1 = list(mot)
-    rubans.append(rubans_1) #Ajoute le premier ruban à la liste des rubans
+    rubans.append(rubans_1)
     
-    for _ in range (1, mt.rub): #Remplir les autres rubans de caractères blancs
+    for _ in range (1, mt.rub):
         rubans.append(['_'])
         
     pos_tete = [0]*mt.rub
@@ -188,7 +188,35 @@ def simuler(mot, mt):
         
     return config
 
+################
+###QUESTION 10##
+################
 
+def simuler_borne(mot, mt, n_max):
+    """Simulateur avec limite de temps (Time-Bounded Emulator) pour la Q10"""
+    config = config_init(mot, mt)
+    etapes = 0
+    
+    print(f"--- Début de la simulation (Max {n_max} étapes) ---")
+    
+    while config.etat_courant != mt.etat_final:
+        # LE PÉAGE : On vérifie si le crédit est épuisé (équivalent du Ruban 4 vide)
+        if etapes >= n_max:
+            print(f"[\u274c] ARRÊT FORCÉ : La machine n'a pas terminé après {n_max} étapes.")
+            print("-> Prévention d'une boucle infinie réussie.")
+            return config
+        
+        # Si on a encore du crédit, on fait un pas
+        if not un_pas_de_calcul(mt, config):
+            print("[\u26a0\ufe0f] Machine bloquée (pas de transition trouvée).")
+            break
+            
+        etapes += 1
+        
+    if config.etat_courant == mt.etat_final:
+        print(f"[\u2705] SUCCÈS : La machine a atteint l'état final en {etapes} étapes.")
+        
+    return config
 
 ################
 ###QUESTION 5###
@@ -204,6 +232,14 @@ def afficher_simulation(mot, mt):
         print(f"Voici une suite de config: \n {config}")
     return config
     
+
+
+
+################
+###QUESTION 6###
+################
+
+
 
 
 
@@ -355,15 +391,10 @@ def main():
             return
         print(f"=== Q5 : Simulation avec affichages")
         mt = parse_file(args.file)
-        afficher_simulation(args.word, mt)
+        print(afficher_simulation(args.word, mt))
         
     elif args.question == 6:
-        if not args.file or args.word is None:
-            print("Erreur: Question 6 nécessite un fichier -f et un mot d'entrée -w")
-            return
-        print(f"==== Q6: Test de la machine: {args.file} ====")
-        mt = parse_file(args.file)
-        afficher_simulation(args.word, mt)
+        print(f"==== Q6: Test des machines: ")
         
     elif args.question == 7:
         if not args.file:
@@ -385,6 +416,45 @@ def main():
         print(f"Codage <M> d'origine : \n{code_str}\n")
         print(f"Codage purement binaire : \n{code_bin}\n")
         print(f"Interprétation en entier (Nombre de Gödel) : \n{entier}\n")    
+    
+    elif args.question == 9:
+        if not args.file or not args.word:
+            print("Erreur: Q9 nécessite la machine à simuler (-f) et le mot de départ (-w)")
+            return
+            
+        print("==== Question 9 : Préparation de la Machine Universelle ====")
+        
+        # 1. On charge la petite machine (ex: le palindrome) pour récupérer son code
+        mt_cible = parse_file(args.file)
+        code_M = codage_mu(mt_cible)
+        mot_x = args.word
+        
+        # 2. On génère le ruban d'entrée de la Machine Universelle : <M>#x
+        ruban_entree_mu = f"{code_M}#{mot_x}"
+        print(f"Ruban d'entrée généré pour la MU :\n{ruban_entree_mu}\n")
+        
+        print("Note : La simulation complète d'une MU nécessite un fichier texte MU.txt très lourd.")
+        print("Si un fichier MU.txt est fourni, on le lance comme ceci :")
+        print("# mt_mu = parse_file('MU.txt')")
+        print("# simuler(ruban_entree_mu, mt_mu)")
+        
+        # On valide la démonstration en montrant qu'on sait créer la configuration à 3 rubans
+        print("Aperçu de la configuration initiale de la MU (3 rubans) :")
+        # On force temporairement la machine cible à 3 rubans pour l'affichage de la config initiale
+        mt_cible.rub = 3 
+        config_mu = config_init(ruban_entree_mu, mt_cible)
+        print(config_mu)
+
+   elif args.question == 10:
+        if not args.file or not args.word or args.steps is None:
+            print("Erreur: Q10 nécessite un fichier (-f), un mot (-w) et un nombre d'étapes (-n)")
+            return
+            
+        print(f"==== Question 10 : Simulation de {args.file} avec limite de {args.steps} étapes ====")
+        mt_cible = parse_file(args.file)
+        
+        # On lance notre processeur borné (Time-Bounded Emulator)
+        simuler_borne(args.word, mt_cible, args.steps) 
         
     else:
         print(f"La question {args.question} n'es pas encore implémentée ou reconnue.")

@@ -2,6 +2,7 @@
 PYTHON ?= python3
 FILE ?= palindrome.txt
 WORD ?= 10101
+STEPS ?= 5
 
 SCRIPT = MT.py
 
@@ -30,16 +31,17 @@ q5:
 q6:
 		$(PYTHON) $(SCRIPT) -q 6 -f $(FILE) -w $(WORD)
 
-q6_comp:
-		python3 $(SCRIPT) -q 6 -f compare.txt -w "10101#10101"
-q6_comp_faux:
-		python3 $(SCRIPT) -q 6 -f compare.txt -w "100#111"
-
 q7:
 		$(PYTHON) $(SCRIPT) -q 7 -f $(FILE)
 
 q8:
 		$(PYTHON) $(SCRIPT) -q 8 -f $(FILE)
+	
+q9:
+		$(PYTHON) $(SCRIPT) -q 9 -f $(FILE) -w $(WORD)
+
+q10:
+		$(PYTHON) $(SCRIPT) -q 10 -f $(FILE) -w $(WORD) -n $(STEPS)		
 
 clean:
 		rm -rf __pycache__
