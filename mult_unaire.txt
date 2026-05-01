@@ -1,0 +1,59 @@
+name: multiplication_unaire
+init: qCopyN
+accept: qAccept
+
+// 1. Copier n sur le ruban 2
+qCopyN, 1, _, _
+qCopyN, 1, 1, _, >, >, -
+
+qCopyN, #, _, _
+qRewindN, #, _, _, >, <, -
+
+// 2. Rembobiner le ruban 2
+qRewindN, 1, 1, _
+qRewindN, 1, 1, _, -, <, -
+
+qRewindN, 1, _, _
+qLoopM, 1, _, _, -, >, -
+
+qRewindN, _, 1, _
+qRewindN, _, 1, _, -, <, -
+
+qRewindN, _, _, _
+qLoopM, _, _, _, -, >, -
+
+// 3. Boucler sur chaque 1 de m (ruban 1)
+// Lecture d'un 1 de m
+qLoopM, 1, 1, _
+qAddN, 1, 1, _, -, -, -
+
+qLoopM, 1, _, _
+qAddN, 1, _, _, -, -, -
+
+// Fin de m (on lit le caractère blanc sur le ruban 1)
+qLoopM, _, _, _
+qAccept, _, _, _, -, -, -
+
+qLoopM, _, 1, _
+qAccept, _, 1, _, -, -, -
+
+// 4. Ajouter n (ruban 2) au ruban 3
+qAddN, 1, 1, _
+qAddN, 1, 1, 1, -, >, >
+
+// Fin de la copie de n (ruban 2 lit le blanc)
+qAddN, 1, _, _
+qRewindNAfterAdd, 1, _, _, >, <, -
+
+// 5. Rembobiner le ruban 2 après l'addition
+qRewindNAfterAdd, 1, 1, _
+qRewindNAfterAdd, 1, 1, _, -, <, -
+
+qRewindNAfterAdd, _, 1, _
+qRewindNAfterAdd, _, 1, _, -, <, -
+
+qRewindNAfterAdd, 1, _, _
+qLoopM, 1, _, _, -, >, -
+
+qRewindNAfterAdd, _, _, _
+qLoopM, _, _, _, -, >, -
