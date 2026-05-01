@@ -28,8 +28,17 @@ q4:
 q5:
 		$(PYTHON) $(SCRIPT) -q 5 -f $(FILE) -w $(WORD)
 
-q6:
-		$(PYTHON) $(SCRIPT) -q 6 -f $(FILE) -w $(WORD)
+=======
+q6_comp:
+		$(PYTHON) $(SCRIPT) -q 6 -f compare.txt -w "10101#10101"
+q6_comp_faux:
+		$(PYTHON) $(SCRIPT) -q 6 -f compare.txt -w "100#111"
+q6_search:
+		$(PYTHON) $(SCRIPT) -q 6 -f recherche.txt -w "11#00#10#01#11"
+q6_search_faux:
+		$(PYTHON) $(SCRIPT) -q 6 -f recherche.txt -w "11#00#10#01"
+q6_mult_un:
+		$(PYTHON) $(SCRIPT) -q 6 -f mult_unaire.txt -w "11#111"
 
 q7:
 		$(PYTHON) $(SCRIPT) -q 7 -f $(FILE)

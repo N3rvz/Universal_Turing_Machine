@@ -1,0 +1,124 @@
+name: Recherche dans une Liste (2 Rubans)
+init: q0
+accept: qAccept
+
+// Copier le 'x' sur le ruban 2
+
+q0,0,_
+q0,0,0,>,>
+q0,1,_
+q0,1,1,>,>
+
+// On croise le premier #
+// Le ruban 1 avance sur le 1er mot a tester.
+// Le ruban 2 recule pour commencer son rembobinage.
+q0,#,_
+qRewindT2,#,_,>,<
+
+//Rembobiner le Ruban 2
+qRewindT2,0,0
+qRewindT2,0,0,-,<
+
+qRewindT2,0,1
+qRewindT2,0,1,-,<
+
+qRewindT2,1,0
+qRewindT2,1,0,-,<
+
+qRewindT2,1,1
+qRewindT2,1,1,-,<
+
+qRewindT2,#,0
+qRewindT2,#,0,-,<
+
+qRewindT2,#,1
+qRewindT2,#,1,-,<
+
+qRewindT2,_,0
+qRewindT2,_,0,-,<
+
+qRewindT2,_,1
+qRewindT2,_,1,-,<
+
+// Le ruban 2 a atteint le blanc, il fait un pas a droite pour se placer sur la 1ere lettre.
+qRewindT2,0,_
+qCompare,0,_,-,>
+qRewindT2,1,_
+qCompare,1,_,-,>
+//ça gere le cas du mot vide 11##10#11
+qRewindT2,#,_
+qCompare,#,_,-,>
+qRewindT2,_,_
+qCompare,_,_,-,>
+
+// Comparer les deux rubans
+qCompare,0,0
+qCompare,0,0,>,>
+qCompare,1,1
+qCompare,1,1,>,>
+
+// Les deux mots finissent exactement en meme temps (lire # ou _ sur rub1, lire _ sur rub2)
+qCompare,#,_
+qAccept,#,_,-,-
+qCompare,_,_
+qAccept,_,_,-,-
+
+// Echec de comparaison : Les lettres sont differentes
+qCompare,0,1
+qSkipT1,0,1,>,-
+qCompare,1,0
+qSkipT1,1,0,>,-
+// Echec: le mot du ruban 1 est plus long que le motif
+qCompare,0,_
+qSkipT1,0,_,>,-
+qCompare,1,_
+qSkipT1,1,_,>,-
+// Echec : le mot du ruban 1 est plus court que le motif
+qCompare,#,0
+qRewindT2,#,0,>,<
+qCompare,#,1
+qRewindT2,#,1,>,<
+
+// Avancer le ruban 1 jusqu'au prochain mot de la liste
+qSkipT1,0,0
+qSkipT1,0,0,>,-
+qSkipT1,0,1
+qSkipT1,0,1,>,-
+qSkipT1,1,0
+qSkipT1,1,0,>,-
+qSkipT1,1,1
+qSkipT1,1,1,>,-
+qSkipT1,0,_
+qSkipT1,0,_,>,-
+qSkipT1,1,_
+qSkipT1,1,_,>,-
+
+// On a trouve le prochain séparateur, on relance le rembobinage du ruban 2
+qSkipT1,#,0
+qRewindT2,#,0,>,<
+qSkipT1,#,1
+qRewindT2,#,1,>,<
+qSkipT1,#,_
+qRewindT2,#,_,>,<
+
+
+// La fin de la liste est atteinte sans avoir trouvé le mot
+qCompare,_,0
+qLoop,_,0,-,-
+qCompare,_,1
+qLoop,_,1,-,-
+
+qSkipT1,_,0
+qLoop,_,0,-,-
+qSkipT1,_,1
+qLoop,_,1,-,-
+qSkipT1,_,_
+qLoop,_,_,-,-
+
+// Etat de boucle infinie
+qLoop,_,0
+qLoop,_,0,-,-
+qLoop,_,1
+qLoop,_,1,-,-
+qLoop,_,_
+qLoop,_,_,-,-
