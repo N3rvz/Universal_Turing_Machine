@@ -235,11 +235,9 @@ def codage_mu(mt):
     morceaux = []
     # 'I' est mappé à '0', 'F' à '1'. Les autres états sont mappés à leur représentation binaire.
     map_etat = {mt.etat_initial: '0', mt.etat_final: '1'}
-    compteur_etat = 2
     compteur_etat = 2 # Commence à 2 car 0 et 1 sont réservés.
     
     def mapping_etats(nom):
-        nonlocal compteur_etat
         nonlocal compteur_etat # Permet de modifier la variable de la fonction parente.
         if nom not in map_etat:
             map_etat[nom] = bin(compteur_etat)[2:]
