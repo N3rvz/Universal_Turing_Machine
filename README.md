@@ -2,7 +2,7 @@
 
 
 
-A comprehensive Python implementation of a multi-tape Turing Machine simulator. This project parses machine definitions directly from the popular *Turing Machine Simulator* format, executes complex multi-tape algorithms, and simulates a Universal Turing Machine with time-bounded execution capabilities to prevent infinite loops.
+A comprehensive Python implementation of a multi-tape Turing Machine simulator. This project parses machine definitions directly from the popular [Turing Machine Simulator](https://turingmachinesimulator.com/) format, executes complex multi-tape algorithms, and simulates a Universal Turing Machine with time-bounded execution capabilities to prevent infinite loops.
 
 ## Features
 
