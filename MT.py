@@ -235,14 +235,6 @@ def afficher_simulation(mot, mt):
 
 
 
-################
-###QUESTION 6###
-################
-
-
-
-
-
 
 
 
@@ -392,8 +384,13 @@ def main():
         print(afficher_simulation(args.word, mt))
         
     elif args.question == 6:
-        print(f"==== Q6: Test des machines: ")
-        
+        if not args.file or args.word is None:
+            print("Erreur: Question 6 nécessite un fichier -f et un mot d'entrée -w")
+            return
+        print(f"==== Q6: Test de la machine: {args.file} ====")
+        mt = parse_file(args.file)
+        afficher_simulation(args.word, mt)
+    
     elif args.question == 7:
         if not args.file:
             print(f"Erreur: Q7 nécessite un fichier -f (MTS)")
