@@ -28,7 +28,6 @@ q4:
 q5:
 		$(PYTHON) $(SCRIPT) -q 5 -f $(FILE) -w $(WORD)
 
-=======
 q6_comp:
 		$(PYTHON) $(SCRIPT) -q 6 -f compare.txt -w "10101#10101"
 q6_comp_faux:
