@@ -1,74 +1,87 @@
-name: Comparateur egalite x#y avec x et y deux entiers représentés en binaire
-init: q0
+name: comparaison
+init: q_copy
 accept: qAccept
 
-// Lecture du premier caractere du mot 1
-q0,0
-qDieze0,X,>
+// copier x sur le ruban 2
+q_copy,0,_
+q_copy,0,0,>,>
+q_copy,1,_
+q_copy,1,1,>,>
+q_copy,#,_
+q_find_end_y,#,_,>,-
 
-q0,1
-qDieze1,Y,>
+// Aller à la fin de y sur le ruban 1
+q_find_end_y,0,_
+q_find_end_y,0,_,>,-
+q_find_end_y,1,_
+q_find_end_y,1,_,>,-
+q_find_end_y,_,_
+q_eq,_,_,<,<
 
-// Si on lit # alors le mot 1 est fini
-q0,#
-qVerifM2,#,>
+// Comparaison de droite à gauche
+q_eq,0,0
+q_eq,0,0,<,<
+q_eq,1,1
+q_eq,1,1,<,<
+q_eq,1,0
+q_lt,1,0,<,<
+q_eq,0,1
+q_gt,0,1,<,<
+q_lt,0,0
+q_lt,0,0,<,<
+q_lt,1,1
+q_lt,1,1,<,<
+q_lt,1,0
+q_lt,1,0,<,<
+q_lt,0,1
+q_gt,0,1,<,<
+q_gt,0,0
+q_gt,0,0,<,<
+q_gt,1,1
+q_gt,1,1,<,<
+q_gt,1,0
+q_lt,1,0,<,<
+q_gt,0,1
+q_gt,0,1,<,<
 
 
-qDieze0,0
-qDieze0,0,>
-qDieze0,1
-qDieze0,1,>
-qDieze0,#
-qMot2_0,#,>
+// Longueurs différentes (ruban 2 vide)
+q_eq,0,_
+q_eq,0,_,<,-
+q_eq,1,_
+q_lt,1,_,<,-
+q_lt,0,_
+q_lt,0,_,<,-
+q_lt,1,_
+q_lt,1,_,<,-
+q_gt,0,_
+q_gt,0,_,<,-
+q_gt,1,_
+q_lt,1,_,<,-
 
-qDieze1,0
-qDieze1,0,>
-qDieze1,1
-qDieze1,1,>
-qDieze1,#
-qMot2_1,#,>
+// Longueurs différentes (ruban 1 fini)
+q_eq,#,0
+q_eq,#,0,-,<
+q_eq,#,1
+q_gt,#,1,-,<
+q_lt,#,0
+q_lt,#,0,-,<
+q_lt,#,1
+q_gt,#,1,-,<
+q_gt,#,0
+q_gt,#,0,-,<
+q_gt,#,1
+q_gt,#,1,-,<
 
-// Traverser les caracteres deja verifies du mot 2
-qMot2_0,X
-qMot2_0,X,>
-qMot2_0,Y
-qMot2_0,Y,>
 
-qMot2_1,X
-qMot2_1,X,>
-qMot2_1,Y
-qMot2_1,Y,>
+//Fin de comparaison
+q_eq,#,_
+q_loop,#,_,-,-
+q_gt,#,_
+q_loop,#,_,-,-
+q_lt,#,_
+qAccept,#,_,-,-
 
-// Correspondance trouvee dans le mot 2
-qMot2_0,0
-qRetour,X,<
-
-qMot2_1,1
-qRetour,Y,<
-
-// Retour vers la gauche
-qRetour,X
-qRetour,X,<
-qRetour,Y
-qRetour,Y,<
-qRetour,#
-qRetourM1,#,<
-
-qRetourM1,0
-qRetourM1,0,<
-qRetourM1,1
-qRetourM1,1,<
-qRetourM1,X
-q0,X,>
-qRetourM1,Y
-q0,Y,>
-qRetourM1,_
-q0,_,>
-
-// Verification que le mot 2 ne contient plus de 0 ou 1
-qVerifM2,X
-qVerifM2,X,>
-qVerifM2,Y
-qVerifM2,Y,>
-qVerifM2,_
-qAccept,_,-
+// Boucle infinie
+q_loop,#,_
+q_loop,#,_,-,-
