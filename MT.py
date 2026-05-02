@@ -337,6 +337,7 @@ def main():
                         help="Numéro de la question à exécuter (ex: 4, 5, 6...)")
     parser.add_argument("-f", "--file", type=str, help="Chemin vers le fichier de la machine au format Turing machine simulator")
     parser.add_argument("-w", "--word", type=str, help="Mot d'entrée pour la simulation sur le ruban")
+    parser.add_argument("-n", "--steps", type=int, help="Nombre de steps effectués pas la machine de Turing")
     
     #Lecture des args
     args = parser.parse_args()
