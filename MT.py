@@ -441,7 +441,7 @@ def main():
         config_mu = config_init(ruban_entree_mu, mt_cible)
         print(config_mu)
 
-   elif args.question == 10:
+    elif args.question == 10:
         if not args.file or not args.word or args.steps is None:
             print("Erreur: Q10 nécessite un fichier (-f), un mot (-w) et un nombre d'étapes (-n)")
             return
