@@ -5,38 +5,41 @@ accept: qAccept
 // ==========================================
 // PHASE 1 : PARSING ET COPIE DE Y
 // ==========================================
-// qInit : Cherche le séparateur # sur le ruban 1
 qInit, 0, _, _
 qInit, 0, _, _, >, -, -
 
 qInit, 1, _, _
 qInit, 1, _, _, >, -, -
 
+// CORRECTION 1 : On conserve le # (au lieu d'écrire _)
 qInit, #, _, _
-qCopyY, _, _, _, >, -, -
+qCopyY, #, _, _, >, -, -
 
-// qCopyY : Transfère y du Ruban 1 vers le Ruban 2
 qCopyY, 0, _, _
 qCopyY, _, 0, _, >, >, -
 
 qCopyY, 1, _, _
 qCopyY, _, 1, _, >, >, -
 
-// Fin de Y. T1 et T2 reculent pour se placer sur le dernier bit
 qCopyY, _, _, _
 qSetupT1, _, _, _, <, <, -
 
 // ==========================================
 // PHASE 2 : ALIGNEMENT SUR LE LSB DE X
 // ==========================================
-// qSetupT1 : Le R1 recule jusqu'à trouver le LSB de x (saute les _)
 qSetupT1, _, 0, _
 qSetupT1, _, 0, _, <, -, -
 
 qSetupT1, _, 1, _
 qSetupT1, _, 1, _, <, -, -
 
-// LSB de x trouvé ! On lance la boucle principale
+// CORRECTION 2 : Permettre à T1 de franchir le # pendant son recul
+qSetupT1, #, 0, _
+qSetupT1, #, 0, _, <, -, -
+
+qSetupT1, #, 1, _
+qSetupT1, #, 1, _, <, -, -
+
 qSetupT1, 0, 0, _
 qLoop, 0, 0, _, -, -, -
 
@@ -53,7 +56,6 @@ qLoop, 1, 1, _, -, -, -
 // ==========================================
 // PHASE 3 : DECREMENTATION DE Y (R2 = R2 - 1)
 // ==========================================
-// Si R2 lit 1 -> devient 0, pas de retenue, on passe à l'addition
 qLoop, 0, 1, _
 qAdd0, 0, 0, _, -, >, -
 
@@ -72,7 +74,6 @@ qAdd0, 0, 0, 1, -, >, -
 qLoop, 1, 1, 1
 qAdd0, 1, 0, 1, -, >, -
 
-// Si R2 lit 0 -> On doit emprunter (Borrow) vers la gauche
 qLoop, 0, 0, _
 qLoopBorrow, 0, 1, _, -, <, -
 
@@ -91,8 +92,6 @@ qLoopBorrow, 0, 1, 1, -, <, -
 qLoop, 1, 0, 1
 qLoopBorrow, 1, 1, 1, -, <, -
 
-// Gestion du Borrow (Propagation de la retenue sur Y)
-// R2 lit 0 -> devient 1, continue à gauche
 qLoopBorrow, 0, 0, _
 qLoopBorrow, 0, 1, _, -, <, -
 
@@ -111,7 +110,6 @@ qLoopBorrow, 0, 1, 1, -, <, -
 qLoopBorrow, 1, 0, 1
 qLoopBorrow, 1, 1, 1, -, <, -
 
-// R2 lit 1 -> devient 0, emprunt terminé, on rembobine Y vers la droite
 qLoopBorrow, 0, 1, _
 qRewindY, 0, 0, _, -, >, -
 
@@ -130,7 +128,7 @@ qRewindY, 0, 0, 1, -, >, -
 qLoopBorrow, 1, 1, 1
 qRewindY, 1, 0, 1, -, >, -
 
-// UNDERFLOW : Si Y cherchait un emprunt et tombe dans le vide, Y = 0. CALCUL TERMINÉ.
+// UNDERFLOW : Y a atteint zéro, fin de la multiplication
 qLoopBorrow, 0, _, _
 qAccept, 0, _, _, -, -, -
 
@@ -149,7 +147,6 @@ qAccept, 0, _, 1, -, -, -
 qLoopBorrow, 1, _, 1
 qAccept, 1, _, 1, -, -, -
 
-// Rembobinage de Y sur son LSB
 qRewindY, 0, 0, _
 qRewindY, 0, 0, _, -, >, -
 
@@ -186,7 +183,6 @@ qRewindY, 0, 1, 1, -, >, -
 qRewindY, 1, 1, 1
 qRewindY, 1, 1, 1, -, >, -
 
-// Fin du rembobinage de Y, on le parque sur _ et on lance l'addition
 qRewindY, 0, _, _
 qAdd0, 0, _, _, -, -, -
 
@@ -209,7 +205,6 @@ qAdd0, 1, _, 1, -, -, -
 // ==========================================
 // PHASE 4 : ADDITION (R3 = R3 + R1)
 // ==========================================
-// qAdd0 : Sans retenue entrante
 qAdd0, 0, _, _
 qAdd0, 0, _, 0, <, -, <
 
@@ -228,19 +223,15 @@ qAdd0, 0, _, 1, <, -, <
 qAdd0, 1, _, 1
 qAdd1, 1, _, 0, <, -, <
 
-// x est épuisé, mais l'accumulateur a encore des bits
 qAdd0, _, _, 0
 qAdd0, _, _, 0, -, -, <
 
 qAdd0, _, _, 1
 qAdd0, _, _, 1, -, -, <
 
-// Addition terminée, on rembobine X et Acc
 qAdd0, _, _, _
 qRewindAdd, _, _, _, >, -, >
 
-
-// qAdd1 : Avec retenue entrante (Carry = 1)
 qAdd1, 0, _, _
 qAdd0, 0, _, 1, <, -, <
 
@@ -259,14 +250,12 @@ qAdd1, 0, _, 0, <, -, <
 qAdd1, 1, _, 1
 qAdd1, 1, _, 1, <, -, <
 
-// x est épuisé, on propage la retenue sur l'accumulateur
 qAdd1, _, _, 0
 qAdd0, _, _, 1, -, -, <
 
 qAdd1, _, _, 1
 qAdd1, _, _, 0, -, -, <
 
-// Fin d'addition avec création d'un nouveau bit (Overhang)
 qAdd1, _, _, _
 qAdd0, _, _, 1, -, -, <
 
@@ -274,7 +263,7 @@ qAdd0, _, _, 1, -, -, <
 // ==========================================
 // PHASE 5 : REMBOBINAGE POST-ADDITION
 // ==========================================
-// qRewindAdd ramène X (R1) et Acc (R3) sur leur LSB respectif
+// CORRECTION 3 : Synchronisation fine des rubans 1 et 3
 qRewindAdd, 0, _, 0
 qRewindAdd, 0, _, 0, >, -, >
 
@@ -287,21 +276,60 @@ qRewindAdd, 0, _, 1, >, -, >
 qRewindAdd, 1, _, 1
 qRewindAdd, 1, _, 1, >, -, >
 
-// Cas où X est plus court que l'Accumulateur (X est déjà sur _, Acc recule)
-qRewindAdd, _, _, 0
-qRewindAdd, _, _, 0, -, -, >
+// Cas A : T1 arrive au bout de X (lit #), mais T3 a encore des bits de Acc
+qRewindAdd, #, _, 0
+qRewindAddWaitT1, #, _, 0, <, -, >
 
-qRewindAdd, _, _, 1
-qRewindAdd, _, _, 1, -, -, >
+qRewindAdd, #, _, 1
+qRewindAddWaitT1, #, _, 1, <, -, >
 
-// Cas inverse
+// Cas B : T3 arrive au bout de l'Acc (lit _), mais T1 a encore des bits de X
 qRewindAdd, 0, _, _
-qRewindAdd, 0, _, _, >, -, -
+qRewindAddWaitT3, 0, _, _, >, -, <
 
 qRewindAdd, 1, _, _
-qRewindAdd, 1, _, _, >, -, -
+qRewindAddWaitT3, 1, _, _, >, -, <
 
-// Tous les rubans sont de retour à droite. On fait un pas à gauche pour se placer 
-// sur le LSB de X, le LSB de Y (qui était parqué), et le LSB de Acc.
-qRewindAdd, _, _, _
-qLoop, _, _, _, <, <, <
+// Cas C : T1 et T3 arrivent au bout en même temps
+qRewindAdd, #, _, _
+qLoop, #, _, _, <, <, <
+
+// État d'attente pour T1 (T1 est garé, T3 avance jusqu'au _)
+qRewindAddWaitT1, 0, _, 0
+qRewindAddWaitT1, 0, _, 0, -, -, >
+
+qRewindAddWaitT1, 1, _, 0
+qRewindAddWaitT1, 1, _, 0, -, -, >
+
+qRewindAddWaitT1, 0, _, 1
+qRewindAddWaitT1, 0, _, 1, -, -, >
+
+qRewindAddWaitT1, 1, _, 1
+qRewindAddWaitT1, 1, _, 1, -, -, >
+
+// T3 a fini, on replace tout le monde sur son LSB
+qRewindAddWaitT1, 0, _, _
+qLoop, 0, _, _, -, <, <
+
+qRewindAddWaitT1, 1, _, _
+qLoop, 1, _, _, -, <, <
+
+// État d'attente pour T3 (T3 est garé, T1 avance jusqu'au #)
+qRewindAddWaitT3, 0, _, 0
+qRewindAddWaitT3, 0, _, 0, >, -, -
+
+qRewindAddWaitT3, 1, _, 0
+qRewindAddWaitT3, 1, _, 0, >, -, -
+
+qRewindAddWaitT3, 0, _, 1
+qRewindAddWaitT3, 0, _, 1, >, -, -
+
+qRewindAddWaitT3, 1, _, 1
+qRewindAddWaitT3, 1, _, 1, >, -, -
+
+// T1 a fini, on replace tout le monde sur son LSB
+qRewindAddWaitT3, #, _, 0
+qLoop, #, _, 0, <, <, -
+
+qRewindAddWaitT3, #, _, 1
+qLoop, #, _, 1, <, <, -
