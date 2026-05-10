@@ -1,7 +1,5 @@
 import argparse
-##############
-##Question 1##
-##############
+
 class MT:
     def __init__(self, etats, alphabet_entree, alphabet_travail, transitions, rub=1):
         self.etats = etats #ensemble fini des états
@@ -37,9 +35,7 @@ class Configuration:
         return result
 
 
-##############
-##Question 2##
-##############
+
 
 def parse_file(MT_file):
     with open(MT_file, "r") as f:
@@ -128,9 +124,7 @@ def config_init(mot, mt):
     return Configuration(mt.etat_initial, rubans, pos_tete)
     
         
-##############
-##Question 3##
-##############
+
 
 def un_pas_de_calcul(mt, config):
     if config.etat_courant == mt.etat_final:
@@ -176,10 +170,6 @@ def un_pas_de_calcul(mt, config):
 
 
 
-###############
-##Question 4###
-###############
-
 def simuler(mot, mt):
     config = config_init(mot, mt) 
     while config.etat_courant != mt.etat_final:
@@ -188,9 +178,7 @@ def simuler(mot, mt):
         
     return config
 
-################
-###QUESTION 10##
-################
+
 
 def simuler_borne(mot, mt, n_max):
     """Simulateur avec limite de temps (Time-Bounded Emulator) pour la Q10"""
@@ -218,9 +206,7 @@ def simuler_borne(mot, mt, n_max):
         
     return config
 
-################
-###QUESTION 5###
-################
+
 
 def afficher_simulation(mot, mt):
     config = config_init(mot, mt)
@@ -243,13 +229,11 @@ def afficher_simulation(mot, mt):
 
 
 ####################################
-###### Machine Universelle##########
+###### Universal Machine ##########
 ####################################
 
 
-###############
-## Question 7##
-###############
+
 
 def codage_mu(mt):
     """
@@ -290,9 +274,7 @@ def codage_mu(mt):
     # On joint toutes les représentations de transition avec '|'.
     return "|".join(morceaux)
 
-################
-###QUESTION 8###
-################
+
 
 def codage_binaire(mt):
     # 1. On récupère le code de la Question 7
